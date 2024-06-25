@@ -2,19 +2,18 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
 
 public class LoginWindow extends JFrame {
+
     private JTextField userText;
     private JPasswordField passwordText;
     private Client client;
 
     public LoginWindow(Client client) {
         this.client = client;
-        initComponents();
-    }
 
-    private void initComponents() {
-        setTitle("Login");
+        setTitle("Login/Register");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(400, 300);
         setResizable(false);
@@ -58,14 +57,6 @@ public class LoginWindow extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(loginButton, gbc);
 
-        loginButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String username = userText.getText();
-                String password = new String(passwordText.getPassword());
-                client.connect(username, password);
-            }
-        });
-
         JButton registerButton = new JButton("Register");
         registerButton.setFont(new Font("Arial", Font.BOLD, 14));
         registerButton.setBackground(new Color(70, 130, 180));
@@ -76,12 +67,82 @@ public class LoginWindow extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(registerButton, gbc);
 
+        loginButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String username = userText.getText();
+                String password = new String(passwordText.getPassword());
+
+                // Attempt to authenticate
+                if (authenticate(username, password)) {
+                    dispose(); // Close the login window
+                    client.startAppWindow(); // Open the chat client main window
+                } else {
+                    JOptionPane.showMessageDialog(LoginWindow.this, "Invalid username or password.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
         registerButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                SwingUtilities.invokeLater(RegisterWindow::new);
+                String username = userText.getText();
+                String password = new String(passwordText.getPassword());
+
+                // Check if username is taken
+                if (isUsernameTaken(username)) {
+                    JOptionPane.showMessageDialog(LoginWindow.this, "Username is already taken.", "Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    registerUser(username, password);
+                    JOptionPane.showMessageDialog(LoginWindow.this, "Registration successful. Please login.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                }
             }
         });
 
         setVisible(true);
+    }
+
+    private boolean authenticate(String username, String password) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("database.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] credentials = line.split(":");
+                if (credentials.length == 2) {
+                    String fileUsername = credentials[0];
+                    String filePassword = credentials[1];
+                    if (fileUsername.equals(username) && filePassword.equals(password)) {
+                        return true;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private boolean isUsernameTaken(String username) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("database.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] credentials = line.split(":");
+                if (credentials.length == 2) {
+                    String fileUsername = credentials[0];
+                    if (fileUsername.equals(username)) {
+                        return true;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private void registerUser(String username, String password) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("database.txt", true))) {
+            writer.write(username + ":" + password);
+            writer.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

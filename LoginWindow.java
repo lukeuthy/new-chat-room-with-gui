@@ -2,7 +2,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class LoginWindow extends JFrame {
 
@@ -13,7 +15,7 @@ public class LoginWindow extends JFrame {
     public LoginWindow(Client client) {
         this.client = client;
 
-        setTitle("Login/Register");
+        setTitle("Login");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(400, 300);
         setResizable(false);
@@ -84,16 +86,7 @@ public class LoginWindow extends JFrame {
 
         registerButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String username = userText.getText();
-                String password = new String(passwordText.getPassword());
-
-                // Check if username is taken
-                if (isUsernameTaken(username)) {
-                    JOptionPane.showMessageDialog(LoginWindow.this, "Username is already taken.", "Error", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    registerUser(username, password);
-                    JOptionPane.showMessageDialog(LoginWindow.this, "Registration successful. Please login.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                }
+                new RegisterWindow(); // Open the registration window
             }
         });
 
@@ -117,32 +110,5 @@ public class LoginWindow extends JFrame {
             e.printStackTrace();
         }
         return false;
-    }
-
-    private boolean isUsernameTaken(String username) {
-        try (BufferedReader reader = new BufferedReader(new FileReader("database.txt"))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] credentials = line.split(":");
-                if (credentials.length == 2) {
-                    String fileUsername = credentials[0];
-                    if (fileUsername.equals(username)) {
-                        return true;
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    private void registerUser(String username, String password) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("database.txt", true))) {
-            writer.write(username + ":" + password);
-            writer.newLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

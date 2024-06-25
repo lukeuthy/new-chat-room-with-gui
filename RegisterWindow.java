@@ -2,9 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 
 public class RegisterWindow extends JFrame {
 
@@ -12,13 +10,10 @@ public class RegisterWindow extends JFrame {
     private JPasswordField passwordField;
 
     public RegisterWindow() {
-        initComponents();
-    }
-
-    private void initComponents() {
         setTitle("Register");
-        setSize(400, 300);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setSize(400, 300);
+        setResizable(false);
         setLocationRelativeTo(null);
 
         JPanel panel = new JPanel(new GridBagLayout());
@@ -60,34 +55,53 @@ public class RegisterWindow extends JFrame {
         panel.add(registerButton, gbc);
 
         registerButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                registerButtonActionPerformed(evt);
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String username = usernameField.getText();
+                String password = new String(passwordField.getPassword());
+
+                if (username.isEmpty() || password.isEmpty()) {
+                    JOptionPane.showMessageDialog(RegisterWindow.this,
+                            "Please enter both username and password.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                if (registerUser(username, password)) {
+                    JOptionPane.showMessageDialog(RegisterWindow.this,
+                            "Registration successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    dispose(); // Close registration window after successful registration
+                } else {
+                    JOptionPane.showMessageDialog(RegisterWindow.this,
+                            "Username already exists. Please choose another username.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
         setVisible(true);
     }
 
-    private void registerButtonActionPerformed(ActionEvent evt) {
-        String username = usernameField.getText();
-        String password = new String(passwordField.getPassword());
-
-        if (!username.matches("[a-zA-Z0-9]+") || !password.matches("[a-zA-Z0-9]+")) {
-            JOptionPane.showMessageDialog(this, "Username and password must be alphanumeric.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+    private boolean registerUser(String username, String password) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("database.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(":");
+                if (parts.length == 2 && parts[0].equals(username)) {
+                    return false; // Username already exists
+                }
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return false;
         }
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("database.txt", true))) {
-            writer.write(username + ":" + password + "\n");
-            JOptionPane.showMessageDialog(this, "User registered successfully!");
-            this.dispose(); // Close the registration window
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "An error occurred while registering. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+            writer.write(username + ":" + password);
+            writer.newLine();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return false;
         }
-    }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(RegisterWindow::new);
+        return true; // Registration successful
     }
 }

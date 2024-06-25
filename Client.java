@@ -17,12 +17,8 @@ public class Client implements Runnable {
         SwingUtilities.invokeLater(() -> new LoginWindow(client));
     }
 
-    public void connect(String username, String password) {
-        if (authenticate(username, password)) {
-            startAppWindow(); // Open the chat client main window
-        } else {
-            JOptionPane.showMessageDialog(null, "Invalid username or password.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
+    public void startAppWindow() {
+        SwingUtilities.invokeLater(() -> new AppWindow().setVisible(true));
     }
 
     private boolean authenticate(String username, String password) {
@@ -40,14 +36,6 @@ public class Client implements Runnable {
             e.printStackTrace();
             return false;
         }
-    }
-
-    public void startAppWindow() {
-        // Create and display the AppWindow
-        SwingUtilities.invokeLater(() -> {
-            AppWindow appWindow = new AppWindow();
-            appWindow.setVisible(true);
-        });
     }
 
     @Override

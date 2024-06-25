@@ -33,6 +33,7 @@ public class UserLogin {
         String user = promptInput("Enter a username (Using only alphanumeric characters): ", "[a-zA-Z0-9]+");
         String pass = promptInput("Enter a password (Using only alphanumeric characters): ", "[a-zA-Z0-9]+");
 
+
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(RECORDS_FILE, true))) {
             writer.write(user + ":" + pass + "\n");
             System.out.println(user + " Registered!");

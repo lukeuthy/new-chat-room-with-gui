@@ -5,100 +5,75 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class Client implements Runnable {
-
-    private Socket client;
+public class Client {
+    private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
-    private boolean done;
+    private ChatApp chatApp;
 
-    public static void main(String[] args) {
-        Client client = new Client();
-        SwingUtilities.invokeLater(() -> new LoginWindow(client));
-    }
-
-    public void connect(String username, String password) {
-        if (authenticate(username, password)) {
-            startAppWindow(); // Open the chat client main window
-        } else {
-            JOptionPane.showMessageDialog(null, "Invalid username or password.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private boolean authenticate(String username, String password) {
+    public Client(String address, int port) {
         try {
-            client = new Socket("localhost", 9999); // Connect to the server
-            out = new PrintWriter(client.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-
-            // Send login command
-            out.println("LOGIN " + username + ":" + password);
-            String response = in.readLine();
-
-            return response != null && response.equals("Login successful.");
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public void startAppWindow() {
-        // Create and display the AppWindow
-        SwingUtilities.invokeLater(() -> {
-            AppWindow appWindow = new AppWindow();
-            appWindow.setVisible(true);
-        });
-    }
-
-    @Override
-    public void run() {
-        try {
-            // Assuming in, out, and client are already initialized by authenticate method
-
-            // Create a thread to handle user input
-            InputHandler inHandler = new InputHandler();
-            Thread t = new Thread(inHandler);
-            t.start();
-
-            // Read and display incoming messages from server
-            String inMessage;
-            while ((inMessage = in.readLine()) != null) {
-                System.out.println(inMessage);
+            socket = new Socket(address, port);
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(socket.getOutputStream(), true);
+            if (login()) {
+                startAppWindow();
+                listenForMessages();
             }
         } catch (IOException e) {
-            shutdown();
+            e.printStackTrace();
+        } finally {
+            closeResources();
         }
     }
 
-    public void shutdown() {
-        done = true;
+    private boolean login() {
+        // Perform login logic here
+        // For demonstration, we'll just simulate a successful login
+        return true;
+    }
+
+    protected void startAppWindow() {
+        chatApp = new ChatApp(this);
+        chatApp.setVisible(true);
+    }
+
+    private void listenForMessages() {
+        new Thread(() -> {
+            try {
+                String message;
+                while ((message = in.readLine()) != null) {
+                    chatApp.displayMessage(message);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                closeResources();
+            }
+        }).start();
+    }
+
+    public void sendMessage(String message) {
+        out.println(message);
+    }
+
+    private void closeResources() {
         try {
             if (in != null) in.close();
             if (out != null) out.close();
-            if (client != null && !client.isClosed()) client.close();
-            System.out.println("Client shutdown");
+            if (socket != null && !socket.isClosed()) socket.close();
         } catch (IOException e) {
-            // Ignore
+            e.printStackTrace();
         }
     }
 
-    class InputHandler implements Runnable {
-        @Override
-        public void run() {
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
             try {
-                BufferedReader inReader = new BufferedReader(new InputStreamReader(System.in));
-                while (!done) {
-                    String message = inReader.readLine();
-                    if (message.equals("/quit")) {
-                        inReader.close();
-                        shutdown();
-                    } else {
-                        out.println(message);
-                    }
-                }
-            } catch (IOException e) {
-                shutdown();
+                new Client("localhost", 9999);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }
+        });
     }
 }

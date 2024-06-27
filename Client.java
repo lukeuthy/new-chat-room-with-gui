@@ -5,75 +5,88 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class Client {
-    private Socket socket;
+public class Client implements Runnable {
+
+    private Socket client;
     private BufferedReader in;
     private PrintWriter out;
-    private ChatApp chatApp;
+    private boolean done;
 
-    public Client(String address, int port) {
+    public static void main(String[] args) {
+        Client client = new Client();
+        SwingUtilities.invokeLater(() -> new LoginWindow(client));
+    }
+
+    public void startAppWindow() {
+        SwingUtilities.invokeLater(() -> new AppWindow().setVisible(true));
+    }
+
+    private boolean authenticate(String username, String password) {
         try {
-            socket = new Socket(address, port);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter(socket.getOutputStream(), true);
-            if (login()) {
-                startAppWindow();
-                listenForMessages();
-            }
+            client = new Socket("localhost", 9999); // Connect to the server
+            out = new PrintWriter(client.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+
+            // Send login command
+            out.println("LOGIN " + username + ":" + password);
+            String response = in.readLine();
+
+            return response != null && response.equals("Login successful.");
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            closeResources();
+            return false;
         }
     }
 
-    private boolean login() {
-        // Perform login logic here
-        // For demonstration, we'll just simulate a successful login
-        return true;
-    }
+    @Override
+    public void run() {
+        try {
+            // Assuming in, out, and client are already initialized by authenticate method
 
-    protected void startAppWindow() {
-        chatApp = new ChatApp(this);
-        chatApp.setVisible(true);
-    }
+            // Create a thread to handle user input
+            InputHandler inHandler = new InputHandler();
+            Thread t = new Thread(inHandler);
+            t.start();
 
-    private void listenForMessages() {
-        new Thread(() -> {
-            try {
-                String message;
-                while ((message = in.readLine()) != null) {
-                    chatApp.displayMessage(message);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                closeResources();
+            // Read and display incoming messages from server
+            String inMessage;
+            while ((inMessage = in.readLine()) != null) {
+                System.out.println(inMessage);
             }
-        }).start();
+        } catch (IOException e) {
+            shutdown();
+        }
     }
 
-    public void sendMessage(String message) {
-        out.println(message);
-    }
-
-    private void closeResources() {
+    public void shutdown() {
+        done = true;
         try {
             if (in != null) in.close();
             if (out != null) out.close();
-            if (socket != null && !socket.isClosed()) socket.close();
+            if (client != null && !client.isClosed()) client.close();
+            System.out.println("Client shutdown");
         } catch (IOException e) {
-            e.printStackTrace();
+            // Ignore
         }
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
+    class InputHandler implements Runnable {
+        @Override
+        public void run() {
             try {
-                new Client("localhost", 9999);
-            } catch (Exception e) {
-                e.printStackTrace();
+                BufferedReader inReader = new BufferedReader(new InputStreamReader(System.in));
+                while (!done) {
+                    String message = inReader.readLine();
+                    if (message.equals("/quit")) {
+                        inReader.close();
+                        shutdown();
+                    } else {
+                        out.println(message);
+                    }
+                }
+            } catch (IOException e) {
+                shutdown();
             }
-        });
+        }
     }
 }

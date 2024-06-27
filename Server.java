@@ -59,7 +59,7 @@ public class Server implements Runnable {
     public void run() {
         try {
             server = new ServerSocket(9999);
-            System.out.println("Server started on port " + server.getLocalPort());
+            System.out.println("Server started on port "+ server.getLocalPort());
             while (!done) {
                 Socket clientSocket = server.accept();
                 ClientConnector handler = new ClientConnector(clientSocket);
@@ -158,6 +158,8 @@ public class Server implements Runnable {
             }
         }
     }
+
+    
 
     public static void main(String[] args) {
         Server server = new Server();

@@ -26,6 +26,7 @@ public class Server implements Runnable {
 
     public Server() {
         ExecutorService tempPool = null;
+        connections = new ArrayList<>();
         try {
             logWriter = new PrintWriter(new FileWriter(LOG_FILE, true));
             connections = new ArrayList<>();
@@ -69,7 +70,8 @@ public class Server implements Runnable {
             System.out.println("Server started on port " + server.getLocalPort());
             while (!done) {
                 Socket clientSocket = server.accept();
-                ClientConnector handler = new ClientConnector(clientSocket);
+                String username = getUserNameFromClient(clientSocket);
+                ClientConnector handler = new ClientConnector(clientSocket, username);
                 connections.add(handler);
                 Thread clientThread = new Thread(handler);
                 clientThread.start();
@@ -78,6 +80,11 @@ public class Server implements Runnable {
         } catch (IOException e) {
             shutdown();
         }
+    }
+
+    private String getUsernameFromClient(Socket clientSocket) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        return reader.readLine(); // Assuming username is sent as the first line from client
     }
 
     public void broadcast(String message) {
@@ -120,24 +127,23 @@ public class Server implements Runnable {
         private Socket clientSocket;
         private BufferedReader in;
         private PrintWriter out;
-        private String nickname;
+        private String username;
 
-        public ClientConnector(Socket clientSocket) {
+        public ClientConnector(Socket clientSocket, String username) {
             this.clientSocket = clientSocket;
+            this.username = username;
         }
 
         @Override
         public void run() {
             try {
-                out = new PrintWriter(clientSocket.getOutputStream(), true);
+                 out = new PrintWriter(clientSocket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                // Get username from the "database.txt"
-                nickname = in.readLine(); // Read the username
-                System.out.println(nickname + " has connected!");
-                broadcast(nickname + " joined the chat!");
+                System.out.println(username + " has connected!");
+                broadcast(username + " joined the chat!");
                 String message;
                 while ((message = in.readLine()) != null) {
-                    broadcast(nickname + ": " + message);
+                    broadcast(username + ": " + message);
                 }
             } catch (IOException e) {
                 shutdown();

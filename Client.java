@@ -1,7 +1,13 @@
 import java.io.*;
 import java.net.Socket;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 public class Client implements Runnable {
+
+    private String username;
     private Socket client;
     private Server server;
     private BufferedReader in;
@@ -13,6 +19,10 @@ public class Client implements Runnable {
         this.server = server;
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public Server getServer() {
         return server;
     }
@@ -22,6 +32,7 @@ public class Client implements Runnable {
     public void run() {
         try {
             client = new Socket("127.0.0.1", 12345);
+            ClientConnector connector = new ClientConnector(client, username);
             out = new PrintWriter(client.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(client.getInputStream()));
             String inMessage;

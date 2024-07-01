@@ -1,14 +1,66 @@
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.List;
 
 public class AppWindow extends JFrame {
 
-    public AppWindow() {
+    private Client client;
+    private Server server;
+    private JTextArea chatArea;
+    private JTextField inputField;
+    private JButton sendButton;
+    private JTextArea participantsArea;
+
+    public AppWindow(Client client) {
+        this.client = client;
+        this.server = client.getServer();
+        this.server.setAppWindow(this);
+        setTitle("Secunnect Chat Room");
         initComponents();
+        loadChatHistory();
+        new Thread(server).start();
     }
 
     private void initComponents() {
-        JScrollBar jScrollBar1 = new JScrollBar();
-        JScrollPane jScrollPane1 = new JScrollPane();
+        chatArea = new JTextArea();
+        chatArea.setEditable(false);
+        JScrollPane chatScrollPane = new JScrollPane(chatArea);
+
+        participantsArea = new JTextArea();
+        participantsArea.setEditable(false);
+        JScrollPane participantsScrollPane = new JScrollPane(participantsArea);
+
+        inputField = new JTextField();
+        sendButton = new JButton("Send");
+
+        sendButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sendMessage();
+            }
+        });
+
+        inputField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    sendMessage();
+                }
+            }
+        });
+
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new BorderLayout());
+        inputPanel.add(inputField, BorderLayout.CENTER);
+        inputPanel.add(sendButton, BorderLayout.EAST);
+
         JPanel jPanel1 = new JPanel();
         JToggleButton jToggleButton1 = new JToggleButton();
         JToggleButton jToggleButton2 = new JToggleButton();
@@ -28,11 +80,18 @@ public class AppWindow extends JFrame {
 
         jToggleButton1.setText("Chat");
 
-        jToggleButton2.setText("Participants");
+        jToggleButton2.setText("Chat Participants");
 
         jToggleButton3.setText("Profile");
 
         jToggleButton4.setText("Exit");
+        jToggleButton4.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                server.shutdown();
+                dispose();
+            }
+        });
 
         GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -45,23 +104,27 @@ public class AppWindow extends JFrame {
                                         .addComponent(jToggleButton4, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE)
                                         .addComponent(jToggleButton2, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE)
                                         .addComponent(jToggleButton1, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE))
-                                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap(15, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
                 jPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(110, 110, 110)
                                 .addComponent(jToggleButton1)
-                                .addGap(30, 30, 30)
+                                .addGap(18, 18, 18)
                                 .addComponent(jToggleButton2)
-                                .addGap(27, 27, 27)
+                                .addGap(18, 18, 18)
                                 .addComponent(jToggleButton3)
-                                .addGap(27, 27, 27)
+                                .addGap(18, 18, 18)
                                 .addComponent(jToggleButton4)
-                                .addGap(32, 32, 32))
+                                .addContainerGap(398, Short.MAX_VALUE))
         );
 
-        jLabel1.setText("Chats");
+        jTabbedPane1.setBackground(new java.awt.Color(128, 128, 128));
+
+        jPanel2.setBackground(new java.awt.Color(128, 128, 128));
+
+        jLabel1.setText("Chat Members");
 
         GroupLayout jPanel2Layout = new GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -70,19 +133,23 @@ public class AppWindow extends JFrame {
                         .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addContainerGap()
                                 .addComponent(jLabel1)
-                                .addContainerGap(573, Short.MAX_VALUE))
+                                .addContainerGap(566, Short.MAX_VALUE))
+                        .addComponent(participantsScrollPane)
         );
         jPanel2Layout.setVerticalGroup(
                 jPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addContainerGap()
+                                .addGap(50, 50, 50)
                                 .addComponent(jLabel1)
-                                .addContainerGap(346, Short.MAX_VALUE))
+                                .addContainerGap(530, Short.MAX_VALUE))
+                        .addComponent(participantsScrollPane)
         );
 
-        jTabbedPane1.addTab("Chats", jPanel2);
+        jTabbedPane1.addTab("tab1", jPanel2);
 
-        jLabel2.setText("Participants");
+        jPanel3.setBackground(new java.awt.Color(128, 128, 128));
+
+        jLabel2.setText("Profile");
 
         GroupLayout jPanel3Layout = new GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -91,19 +158,21 @@ public class AppWindow extends JFrame {
                         .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addContainerGap()
                                 .addComponent(jLabel2)
-                                .addContainerGap(540, Short.MAX_VALUE))
+                                .addContainerGap(594, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
                 jPanel3Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addContainerGap()
+                                .addGap(50, 50, 50)
                                 .addComponent(jLabel2)
-                                .addContainerGap(346, Short.MAX_VALUE))
+                                .addContainerGap(530, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Participants", jPanel3);
+        jTabbedPane1.addTab("tab2", jPanel3);
 
-        jLabel3.setText("Profile");
+        jPanel4.setBackground(new java.awt.Color(128, 128, 128));
+
+        jLabel3.setText("Chat");
 
         GroupLayout jPanel4Layout = new GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -111,45 +180,76 @@ public class AppWindow extends JFrame {
                 jPanel4Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(jPanel4Layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(jLabel3, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(565, Short.MAX_VALUE))
+                                .addComponent(jLabel3)
+                                .addContainerGap(594, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
                 jPanel4Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addContainerGap()
+                                .addGap(50, 50, 50)
                                 .addComponent(jLabel3)
-                                .addContainerGap(346, Short.MAX_VALUE))
+                                .addContainerGap(530, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Profile", jPanel4);
+        jTabbedPane1.addTab("tab3", jPanel4);
 
         GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
                                 .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTabbedPane1))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addComponent(chatScrollPane)
+                                        .addComponent(inputPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(jTabbedPane1)
         );
         layout.setVerticalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(jTabbedPane1)
-                                .addContainerGap())
-                        .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(chatScrollPane, GroupLayout.DEFAULT_SIZE, 524, Short.MAX_VALUE)
+                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(inputPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jTabbedPane1))
         );
 
         pack();
     }
 
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new AppWindow().setVisible(true);
+    private void sendMessage() {
+        String message = inputField.getText().trim();
+        if (!message.isEmpty()) {
+            server.broadcast("You: " + message);  // Add "You" prefix
+            inputField.setText("");
+        }
+    }
+
+    public void appendMessage(String message) {
+        chatArea.append(message + "\n");
+    }
+
+    public void updateParticipants(List<String> participants) {
+        participantsArea.setText("");
+        for (String participant : participants) {
+            participantsArea.append(participant + "\n");
+        }
+    }
+
+    private void loadChatHistory() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("chats.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                chatArea.append(line + "\n");
             }
-        });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

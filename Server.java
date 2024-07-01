@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -21,6 +22,7 @@ public class Server implements Runnable {
     private final String LOG_FILE = "chats.txt";
     private PrintWriter logWriter;
     private final ExecutorService pool;
+    private AppWindow appWindow; // Reference to AppWindow for GUI updates
 
     public Server() {
         ExecutorService tempPool = null;
@@ -35,6 +37,11 @@ public class Server implements Runnable {
         } finally {
             pool = tempPool;
         }
+    }
+
+    // Setter for AppWindow reference
+    public void setAppWindow(AppWindow appWindow) {
+        this.appWindow = appWindow;
     }
 
     private void restoreChatLogs(ClientConnector client) {
@@ -59,7 +66,7 @@ public class Server implements Runnable {
     public void run() {
         try {
             server = new ServerSocket(9999);
-            System.out.println("Server started on port "+ server.getLocalPort());
+            System.out.println("Server started on port " + server.getLocalPort());
             while (!done) {
                 Socket clientSocket = server.accept();
                 ClientConnector handler = new ClientConnector(clientSocket);
@@ -74,13 +81,21 @@ public class Server implements Runnable {
     }
 
     public void broadcast(String message) {
+        String timestampedMessage = getTimestamp() + " - " + message;
         for (ClientConnector ch : connections) {
             if (ch != null) {
-                LocalDateTime timestamp = LocalDateTime.now();
-                String messageTime = timestamp.format(DateTimeFormatter.ofPattern("HH:mm"));
-                ch.sendMessage(messageTime + " - " + message);
+                ch.sendMessage(timestampedMessage);
             }
         }
+        logMessage(message);  // Log the message
+        if (appWindow != null) {
+            appWindow.appendMessage(timestampedMessage);  // Update GUI chat area
+        }
+    }
+
+    private String getTimestamp() {
+        LocalDateTime timestamp = LocalDateTime.now();
+        return timestamp.format(DateTimeFormatter.ofPattern("HH:mm"));
     }
 
     public void shutdown() {
@@ -116,29 +131,14 @@ public class Server implements Runnable {
             try {
                 out = new PrintWriter(clientSocket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                out.println("Please enter a nickname: ");
-                nickname = in.readLine();
+                // Get username from the "database.txt"
+                nickname = in.readLine(); // Read the username
                 System.out.println(nickname + " has connected!");
                 broadcast(nickname + " joined the chat!");
                 String message;
                 while ((message = in.readLine()) != null) {
-                    if (message.startsWith("/nick ")) {
-                        String[] messageSplit = message.split(" ", 2);
-                        if (messageSplit.length == 2) {
-                            broadcast(nickname + " renamed themselves to " + messageSplit[1]);
-                            System.out.println(nickname + " renamed themselves to " + messageSplit[1]);
-                            nickname = messageSplit[1];
-                        } else {
-                            out.println("No nickname provided!");
-                        }
-                    } else if (message.startsWith("/quit")) {
-                        break;
-                    } else {
-                        broadcast(nickname + ": " + message);
-                        logMessage(nickname + ": " + message);
-                    }
+                    broadcast(nickname + ": " + message);
                 }
-                shutdown();
             } catch (IOException e) {
                 shutdown();
             }
@@ -159,13 +159,19 @@ public class Server implements Runnable {
         }
     }
 
-    
-
     public static void main(String[] args) {
         Server server = new Server();
         Thread serverThread = new Thread(server);
         serverThread.start();
 
         Runtime.getRuntime().addShutdownHook(new Thread(server::shutdown));
+
+        // Initialize and show the AppWindow
+        SwingUtilities.invokeLater(() -> {
+            Client client = new Client(server);  // Pass the server instance to the client
+            AppWindow appWindow = new AppWindow(client);
+            server.setAppWindow(appWindow);  // Set AppWindow in Server
+            client.startAppWindow();
+        });
     }
 }

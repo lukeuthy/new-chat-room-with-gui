@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -94,7 +95,7 @@ public class LoginWindow extends JFrame {
     }
 
     private boolean authenticate(String username, String password) {
-        try (BufferedReader reader = new BufferedReader(new FileReader("database.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("D:\\javaProjects\\javaChatRoom\\src\\database.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] credentials = line.split(":");
@@ -106,6 +107,9 @@ public class LoginWindow extends JFrame {
                     }
                 }
             }
+        } catch (FileNotFoundException e) {
+            JOptionPane.showMessageDialog(LoginWindow.this, "Database file not found.", "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -13,6 +13,8 @@ public class LoginWindow extends JFrame {
     private JPasswordField passwordText;
     private Client client;
 
+    private static final String DATABASE_PATH = "src/database.txt";
+
     public LoginWindow(Client client) {
         this.client = client;
 
@@ -95,7 +97,7 @@ public class LoginWindow extends JFrame {
     }
 
     private boolean authenticate(String username, String password) {
-        try (BufferedReader reader = new BufferedReader(new FileReader("D:\\javaProjects\\javaChatRoom\\src\\database.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(DATABASE_PATH))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] credentials = line.split(":");

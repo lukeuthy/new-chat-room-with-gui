@@ -1,15 +1,11 @@
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Client implements Runnable {
     private Socket client;
     private Server server;
     private BufferedReader in;
     private PrintWriter out;
-    private List<String> participants = new ArrayList<>();
-    private List<String> onlineParticipants = new ArrayList<>();
     private boolean done;
     private AppWindow appWindow;
 
@@ -75,15 +71,4 @@ public class Client implements Runnable {
         client.startAppWindow();
     }
 
-    public void setOnline(String participant) {
-        if (!onlineParticipants.contains(participant)) {
-            onlineParticipants.add(participant);
-        }
-        appWindow.updateParticipants(participants, onlineParticipants);
-    }
-
-    public void setOffline(String participant) {
-        onlineParticipants.remove(participant);
-        appWindow.updateParticipants(participants, onlineParticipants);
-    }
 }

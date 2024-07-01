@@ -9,7 +9,7 @@
 2024-06-23 04:08:58 - nikko: do u want me
 2024-06-23 04:18:13 - oten: wassap it's 4:18AM
 2024-06-23 04:18:18 - nikka: kapoy nako
-2024-06-23 04:41:37 - hi: NIGAAAAAAAAAAAAA
+2024-06-23 04:41:37 - hi: hello
 2024-06-23 04:42:35 - hi: hi
 2024-06-23 04:42:36 - hi: hi
 2024-06-23 04:42:37 - hi: hi
@@ -44,3 +44,6 @@
 2024-06-24 15:23:04 - Clyd G: otso pa
 2024-06-24 15:23:52 - kharlkisskolalat: nicket
 2024-06-24 15:23:54 - kharlkisskolalat: widasdkwa
+null has disconnected
+hello has joined the chat
+hello has disconnected

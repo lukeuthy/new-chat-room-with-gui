@@ -13,7 +13,7 @@ public class LoginWindow extends JFrame {
     private JPasswordField passwordText;
     private Client client;
 
-    private static final String DATABASE_PATH = "src/database.txt";
+    private static final String DATABASE_PATH = "database.txt";
 
     public LoginWindow(Client client) {
         this.client = client;

@@ -9,7 +9,7 @@ public class RegisterWindow extends JFrame {
     private JTextField usernameField;
     private JPasswordField passwordField;
 
-    private static final String DATABASE_PATH = "src/database.txt";
+    private static final String DATABASE_PATH = "database.txt";
 
     public RegisterWindow() {
         setTitle("Register");

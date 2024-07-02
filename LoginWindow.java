@@ -12,7 +12,6 @@ public class LoginWindow extends JFrame {
     private JTextField userText;
     private JPasswordField passwordText;
     private Client client;
-    private String username;
 
     private static final String DATABASE_PATH = "src/database.txt";
 
@@ -81,16 +80,14 @@ public class LoginWindow extends JFrame {
                 // Attempt to authenticate
                 if (authenticate(username, password)) {
                     dispose(); // Close the login window
-                    client.startAppWindow(username); // Open the chat client main window
+                    client.setUsername(username); // Set the username
+                    client.startAppWindow(); // Open the chat client main window
+                    new Thread(client).start();
                 } else {
                     JOptionPane.showMessageDialog(LoginWindow.this, "Invalid username or password.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
-
-        public String getUsername() {
-            return username;
-        }
 
         registerButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

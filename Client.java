@@ -1,85 +1,73 @@
+import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 
 public class Client implements Runnable {
 
-    private String username;
-    private Socket client;
-    private Server server;
+    private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
-    private boolean done;
+    private Server server;
     private AppWindow appWindow;
+    private String username;
 
     public Client(Server server) {
         this.server = server;
     }
 
+    // Set the username (will be called from LoginWindow)
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    @Override
+    public void run() {
+        try {
+            socket = new Socket("127.0.0.1", 10000); // Match the server port
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true);
+
+            // Send the username to the server
+            out.println(username);
+
+            String inMessage;
+            while ((inMessage = in.readLine()) != null) {
+                appWindow.appendMessage(inMessage); // Assuming AppWindow has this method
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (in != null) in.close();
+                if (out != null) out.close();
+                if (socket != null && !socket.isClosed()) socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void startAppWindow() {
+        SwingUtilities.invokeLater(() -> {
+            appWindow = new AppWindow(this);
+            appWindow.setVisible(true);
+        });
     }
 
     public Server getServer() {
         return server;
     }
 
-
-    @Override
-    public void run() {
-        try {
-            client = new Socket("127.0.0.1", 12345);
-            ClientConnector connector = new ClientConnector(client, username);
-            out = new PrintWriter(client.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-            String inMessage;
-            while ((inMessage = in.readLine()) != null) {
-                appWindow.appendMessage(inMessage);
-            }
-        } catch (IOException e) {
-            shutdown();
-        }
-    }
-
-    public void shutdown() {
-        done = true;
-        try {
-            if (in != null) in.close();
-            if (out != null) out.close();
-            if (client != null && !client.isClosed()) client.close();
-            System.out.println("Client shutdown");
-        } catch (IOException e) {
-            // Ignore
-        }
-    }
-
-    public void sendMessage(String message) {
-        if (out != null) {
-            out.println(message);
-        }
-    }
-
-    public void setAppWindow(AppWindow appWindow) {
-        this.appWindow = appWindow;
-    }
-
-    public void startAppWindow() {
-        appWindow = new AppWindow(this);
-        this.server.setAppWindow(this.appWindow);
-        new Thread(this).start();
-    }
-
     public static void main(String[] args) {
         Server server = new Server();
-        Client client = new Client(server);
-
         Thread serverThread = new Thread(server);
         serverThread.start();
 
-        client.startAppWindow();
-    }
+        Runtime.getRuntime().addShutdownHook(new Thread(server::shutdown));
 
+        SwingUtilities.invokeLater(() -> {
+            Client client = new Client(server);
+            new LoginWindow(client); // Start with the LoginWindow
+        });
+    }
 }

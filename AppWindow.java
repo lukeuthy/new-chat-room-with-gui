@@ -79,10 +79,28 @@ public class AppWindow extends JFrame {
         jPanel1.setBackground(new java.awt.Color(64, 64, 64));
 
         jToggleButton1.setText("Chat");
+        jToggleButton1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jTabbedPane1.setSelectedIndex(0);
+            }
+        });
 
         jToggleButton2.setText("Chat Participants");
+        jToggleButton2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jTabbedPane1.setSelectedIndex(1);
+            }
+        });
 
         jToggleButton3.setText("Profile");
+        jToggleButton3.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jTabbedPane1.setSelectedIndex(2);
+            }
+        });
 
         jToggleButton4.setText("Exit");
         jToggleButton4.addActionListener(new ActionListener() {
@@ -120,78 +138,27 @@ public class AppWindow extends JFrame {
                                 .addContainerGap(398, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.setBackground(new java.awt.Color(128, 128, 128));
-
         jPanel2.setBackground(new java.awt.Color(128, 128, 128));
-
-        jLabel1.setText("Chat Members");
-
-        GroupLayout jPanel2Layout = new GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-                jPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel1)
-                                .addContainerGap(566, Short.MAX_VALUE))
-                        .addComponent(participantsScrollPane)
-        );
-        jPanel2Layout.setVerticalGroup(
-                jPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGap(50, 50, 50)
-                                .addComponent(jLabel1)
-                                .addContainerGap(530, Short.MAX_VALUE))
-                        .addComponent(participantsScrollPane)
-        );
-
-        jTabbedPane1.addTab("tab1", jPanel2);
+        jPanel2.setLayout(new BorderLayout());
+        jLabel1.setText("Chat Participants");
+        jPanel2.add(jLabel1, BorderLayout.NORTH);
+        jPanel2.add(participantsScrollPane, BorderLayout.CENTER);
 
         jPanel3.setBackground(new java.awt.Color(128, 128, 128));
-
+        jPanel3.setLayout(new BorderLayout());
         jLabel2.setText("Profile");
-
-        GroupLayout jPanel3Layout = new GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-                jPanel3Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel2)
-                                .addContainerGap(594, Short.MAX_VALUE))
-        );
-        jPanel3Layout.setVerticalGroup(
-                jPanel3Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addGap(50, 50, 50)
-                                .addComponent(jLabel2)
-                                .addContainerGap(530, Short.MAX_VALUE))
-        );
-
-        jTabbedPane1.addTab("tab2", jPanel3);
+        jPanel3.add(jLabel2, BorderLayout.NORTH);
 
         jPanel4.setBackground(new java.awt.Color(128, 128, 128));
-
+        jPanel4.setLayout(new BorderLayout());
         jLabel3.setText("Chat");
+        jPanel4.add(jLabel3, BorderLayout.NORTH);
+        jPanel4.add(chatScrollPane, BorderLayout.CENTER);
+        jPanel4.add(inputPanel, BorderLayout.SOUTH);
 
-        GroupLayout jPanel4Layout = new GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-                jPanel4Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel3)
-                                .addContainerGap(594, Short.MAX_VALUE))
-        );
-        jPanel4Layout.setVerticalGroup(
-                jPanel4Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addGap(50, 50, 50)
-                                .addComponent(jLabel3)
-                                .addContainerGap(530, Short.MAX_VALUE))
-        );
-
-        jTabbedPane1.addTab("tab3", jPanel4);
+        jTabbedPane1.addTab("Chat", jPanel4);
+        jTabbedPane1.addTab("Chat Participants", jPanel2);
+        jTabbedPane1.addTab("Profile", jPanel3);
 
         GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -201,10 +168,7 @@ public class AppWindow extends JFrame {
                                 .addContainerGap()
                                 .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                        .addComponent(chatScrollPane)
-                                        .addComponent(inputPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addComponent(jTabbedPane1)
+                                .addComponent(jTabbedPane1))
         );
         layout.setVerticalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -212,12 +176,8 @@ public class AppWindow extends JFrame {
                                 .addContainerGap()
                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                         .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(chatScrollPane, GroupLayout.DEFAULT_SIZE, 524, Short.MAX_VALUE)
-                                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(inputPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jTabbedPane1))
+                                        .addComponent(jTabbedPane1))
+                                .addContainerGap())
         );
 
         pack();
@@ -235,7 +195,7 @@ public class AppWindow extends JFrame {
         chatArea.append(message + "\n");
     }
 
-    public void updateParticipants(List<String> participants) {
+    public void updateParticipants(List<String> participants, List<String> onlineParticipants) {
         participantsArea.setText("");
         for (String participant : participants) {
             participantsArea.append(participant + "\n");

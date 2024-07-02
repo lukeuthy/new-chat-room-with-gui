@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 
 public class Server implements Runnable {
 
-    private List<ClientConnector> connections;
+    private List<ClientConnector> connections = new ArrayList<>();
     private ServerSocket server;
     private boolean done;
     private final String LOG_FILE = "chats.txt";
@@ -26,7 +26,6 @@ public class Server implements Runnable {
 
     public Server() {
         ExecutorService tempPool = null;
-        connections = new ArrayList<>();
         try {
             logWriter = new PrintWriter(new FileWriter(LOG_FILE, true));
             connections = new ArrayList<>();
@@ -66,25 +65,24 @@ public class Server implements Runnable {
     @Override
     public void run() {
         try {
-            server = new ServerSocket(9999);
+            server = new ServerSocket(10000);
             System.out.println("Server started on port " + server.getLocalPort());
             while (!done) {
-                Socket clientSocket = server.accept();
-                String username = getUserNameFromClient(clientSocket);
-                ClientConnector handler = new ClientConnector(clientSocket, username);
-                connections.add(handler);
-                Thread clientThread = new Thread(handler);
-                clientThread.start();
-                restoreChatLogs(handler); // Send chat logs to the newly connected client
+                try {
+                    Socket clientSocket = server.accept();
+                    ClientConnector handler = new ClientConnector(clientSocket);
+                    connections.add(handler);
+                    pool.execute(handler); // Use thread pool
+                    restoreChatLogs(handler); // Send chat logs to the newly connected client
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    shutdown();
+                }
             }
         } catch (IOException e) {
+            e.printStackTrace();
             shutdown();
         }
-    }
-
-    private String getUsernameFromClient(Socket clientSocket) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        return reader.readLine(); // Assuming username is sent as the first line from client
     }
 
     public void broadcast(String message) {
@@ -116,7 +114,7 @@ public class Server implements Runnable {
             }
             pool.shutdown();
             logWriter.close();
-            System.out.println("Server shutdown");
+            System.out.println("Server shutdown completed.");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -127,25 +125,27 @@ public class Server implements Runnable {
         private Socket clientSocket;
         private BufferedReader in;
         private PrintWriter out;
-        private String username;
+        private String nickname;
 
-        public ClientConnector(Socket clientSocket, String username) {
+        public ClientConnector(Socket clientSocket) {
             this.clientSocket = clientSocket;
-            this.username = username;
         }
 
         @Override
         public void run() {
             try {
-                 out = new PrintWriter(clientSocket.getOutputStream(), true);
+                out = new PrintWriter(clientSocket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                System.out.println(username + " has connected!");
-                broadcast(username + " joined the chat!");
+                // Get username from the "database.txt"
+                nickname = in.readLine(); // Read the username
+                System.out.println(nickname + " has connected!");
+                broadcast(nickname + " joined the chat!");
                 String message;
                 while ((message = in.readLine()) != null) {
-                    broadcast(username + ": " + message);
+                    broadcast(nickname + ": " + message);
                 }
             } catch (IOException e) {
+                e.printStackTrace();
                 shutdown();
             }
         }
@@ -170,14 +170,13 @@ public class Server implements Runnable {
         Thread serverThread = new Thread(server);
         serverThread.start();
 
-        Runtime.getRuntime().addShutdownHook(new Thread(server::shutdown));
-
-        // Initialize and show the AppWindow
-        SwingUtilities.invokeLater(() -> {
-            Client client = new Client(server);  // Pass the server instance to the client
-            AppWindow appWindow = new AppWindow(client);
-            server.setAppWindow(appWindow);  // Set AppWindow in Server
-            client.startAppWindow();
-        });
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            server.shutdown();
+            try {
+                server.shutdown();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }));
     }
 }

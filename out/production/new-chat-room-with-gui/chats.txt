@@ -47,3 +47,6 @@
 null has disconnected
 hello has joined the chat
 hello has disconnected
+2024-07-02 09:48:14 - Nikko joined the chat!
+2024-07-02 09:48:40 - Mart joined the chat!
+2024-07-02 10:00:02 - Nikko joined the chat!

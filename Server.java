@@ -65,7 +65,7 @@ public class Server implements Runnable {
     @Override
     public void run() {
         try {
-            server = new ServerSocket(10420);
+            server = new ServerSocket(10240);
             System.out.println("Server started on port " + server.getLocalPort());
             while (!done) {
                 try {

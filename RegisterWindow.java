@@ -9,8 +9,6 @@ public class RegisterWindow extends JFrame {
     private JTextField usernameField;
     private JPasswordField passwordField;
 
-    private static final String DATABASE_PATH = "database.txt";
-
     public RegisterWindow() {
         setTitle("Register");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -83,7 +81,7 @@ public class RegisterWindow extends JFrame {
     }
 
     private boolean registerUser(String username, String password) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(DATABASE_PATH))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("D:\\javaProjects\\javaChatRoom\\src\\database.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(":");
@@ -96,7 +94,7 @@ public class RegisterWindow extends JFrame {
             return false;
         }
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(DATABASE_PATH, true))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("D:\\javaProjects\\javaChatRoom\\src\\database.txt", true))) {
             writer.write(username + ":" + password);
             writer.newLine();
         } catch (IOException ex) {

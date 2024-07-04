@@ -3,7 +3,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -12,8 +11,6 @@ public class LoginWindow extends JFrame {
     private JTextField userText;
     private JPasswordField passwordText;
     private Client client;
-
-    private static final String DATABASE_PATH = "database.txt";
 
     public LoginWindow(Client client) {
         this.client = client;
@@ -80,9 +77,9 @@ public class LoginWindow extends JFrame {
                 // Attempt to authenticate
                 if (authenticate(username, password)) {
                     dispose(); // Close the login window
-                    client.setUsername(username); // Set the username
+                    client.setUsername(username); // Set the username in the client
                     client.startAppWindow(); // Open the chat client main window
-                    new Thread(client).start();
+                    new Thread(client).start(); // Start the client thread
                 } else {
                     JOptionPane.showMessageDialog(LoginWindow.this, "Invalid username or password.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -99,7 +96,7 @@ public class LoginWindow extends JFrame {
     }
 
     private boolean authenticate(String username, String password) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(DATABASE_PATH))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("D:\\javaProjects\\javaChatRoom\\src\\database.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] credentials = line.split(":");
@@ -111,10 +108,8 @@ public class LoginWindow extends JFrame {
                     }
                 }
             }
-        } catch (FileNotFoundException e) {
-            JOptionPane.showMessageDialog(LoginWindow.this, "Database file not found.", "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
         } catch (IOException e) {
+            JOptionPane.showMessageDialog(LoginWindow.this, "Database file not found.", "Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
         return false;

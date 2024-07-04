@@ -4,19 +4,13 @@ import java.net.Socket;
 
 public class Client implements Runnable {
 
-    private Socket clientSocket;
+    protected Socket clientSocket;
     private BufferedReader in;
     private PrintWriter out;
-    private Server server;
     private AppWindow appWindow;
     private String username;
 
-    public Client() {
-        run();
-    }
-
-    // Set the username (will be called from LoginWindow)
-    public void setUsername(String username) {
+    public Client(String username) {
         this.username = username;
     }
 
@@ -27,12 +21,13 @@ public class Client implements Runnable {
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             out = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream()), true);
 
-            // Send the username to the server
-            out.println(username);
+            out.println(username); // Send username to server
 
             String inMessage;
             while ((inMessage = in.readLine()) != null) {
-                //appWindow.appendMessage(inMessage); // Assuming AppWindow has this method
+                if (appWindow != null) {
+                    appWindow.appendMessage(inMessage);
+                }
             }
 
         } catch (IOException e) {
@@ -55,18 +50,15 @@ public class Client implements Runnable {
         });
     }
 
-    public Server getServer() {
-        return server;
+    public void sendMessage(String message) {
+        if (out != null) {
+            out.println(message);
+        }
     }
 
     public static void main(String[] args) {
-        /*Server server = new Server();
-        Thread serverThread = new Thread(server);
-        serverThread.start();*/
-
-        //Runtime.getRuntime().addShutdownHook(new Thread(server::shutdown));
-
-        Client client = new Client();
+        String username = JOptionPane.showInputDialog("Enter your username:");
+        Client client = new Client(username);
 
         LoginWindow window = new LoginWindow(client); // Start with the LoginWindow
         window.setVisible(true);

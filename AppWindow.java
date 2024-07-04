@@ -1,9 +1,12 @@
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 
 public class AppWindow extends javax.swing.JFrame {
 
@@ -21,6 +24,7 @@ public class AppWindow extends javax.swing.JFrame {
         this.client = client;
         initComponents();
         startListeningForMessages();
+        startUpdatingMembersList();
     }
 
     private void initComponents() {
@@ -45,7 +49,7 @@ public class AppWindow extends javax.swing.JFrame {
         deleteAccountButton = new JButton("Delete Account");
         usernameLabel = new JLabel("Username:");
         passwordLabel = new JLabel("Password:");
-        jLabel1 = new JLabel("Chat Members"); // Ensure this is initialized
+        jLabel1 = new JLabel("Chat Members");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -68,6 +72,12 @@ public class AppWindow extends javax.swing.JFrame {
         jButton7.setText("Profile");
 
         jButton2.setText("Exit");
+        jButton2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0); // Exit the program
+            }
+        });
 
         jLabel4.setText("Logo pic here.");
 
@@ -92,13 +102,12 @@ public class AppWindow extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap())
-        );
+                                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERREDMETHOD
+                                        .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addContainerGap())
+                        );
 
         chatArea.setEditable(false);
         chatArea.setLineWrap(true);
@@ -109,6 +118,16 @@ public class AppWindow extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 sendMessage();
+            }
+        });
+
+        // Event listener for Enter key in chat input
+        chatInput.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    sendMessage();
+                }
             }
         });
 
@@ -237,7 +256,6 @@ public class AppWindow extends javax.swing.JFrame {
 
     private void sendMessage() {
         String message = chatInput.getText();
-        chatArea.append("Me: " + message + "\n");
         chatInput.setText("");
         client.sendMessage(message);
     }
@@ -251,11 +269,11 @@ public class AppWindow extends javax.swing.JFrame {
     }
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        jTabbedPane1.setSelectedIndex(1); // Switch to Chat Members tab
     }
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        jTabbedPane1.setSelectedIndex(0); // Switch to Chats tab
     }
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
@@ -276,6 +294,12 @@ public class AppWindow extends javax.swing.JFrame {
                 BufferedReader in = new BufferedReader(new InputStreamReader(client.clientSocket.getInputStream()));
                 String message;
                 while ((message = in.readLine()) != null) {
+                    if (message.contains(client.getUsername())) {
+                        // Avoid showing "Me" messages with the username format
+                        if (message.startsWith(client.getUsername() + ": ")) {
+                            message = message.replace(client.getUsername() + ": ", "Me: ");
+                        }
+                    }
                     appendMessage(message);
                 }
             } catch (IOException e) {
@@ -285,10 +309,28 @@ public class AppWindow extends javax.swing.JFrame {
         listenerThread.start();
     }
 
+    private void startUpdatingMembersList() {
+        Thread membersUpdateThread = new Thread(() -> {
+            while (true) {
+                try {
+                    List<String> activeUsers = client.getActiveUsers();
+                    chatMembersArea.setText("");
+                    for (String user : activeUsers) {
+                        chatMembersArea.append(user + "\n");
+                    }
+                    Thread.sleep(5000); // Update every 5 seconds
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        membersUpdateThread.start();
+    }
+
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new AppWindow(new Client("DefaultUser")).setVisible(true); // Use default username for testing
+                new AppWindow(new Client("DefaultUser")).setVisible(true);
             }
         });
     }

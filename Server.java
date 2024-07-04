@@ -40,7 +40,7 @@ public class Server implements Runnable {
                     synchronized (connections) {
                         connections.add(handler);
                     }
-                    pool.execute(handler); // Use thread pool
+                    pool.execute(handler);
                 } catch (IOException e) {
                     e.printStackTrace();
                     shutdown();
@@ -93,12 +93,23 @@ public class Server implements Runnable {
         }
     }
 
+    public List<String> getActiveUsers() {
+        List<String> activeUsers = new ArrayList<>();
+        synchronized (connections) {
+            for (ClientConnector ch : connections) {
+                activeUsers.add(ch.getUsername() + " - " + (ch.isConnected() ? "Online" : "Offline"));
+            }
+        }
+        return activeUsers;
+    }
+
     class ClientConnector implements Runnable {
 
         private Socket clientSocket;
         private BufferedReader in;
         private PrintWriter out;
-        private String nickname;
+        private String username;
+        private boolean connected;
 
         public ClientConnector(Socket clientSocket) {
             this.clientSocket = clientSocket;
@@ -109,17 +120,18 @@ public class Server implements Runnable {
             try {
                 out = new PrintWriter(clientSocket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                nickname = in.readLine(); // Read username from client
-                System.out.println(nickname + " has connected!");
-                broadcast(nickname + " joined the chat!");
+                username = in.readLine(); // Read username from client
+                connected = true;
+                System.out.println(username + " has connected!");
+                broadcast(username + " joined the chat!");
                 String message;
                 while ((message = in.readLine()) != null) {
-                    broadcast(nickname + ": " + message);
+                    broadcast(username + ": " + message);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                shutdown(); // Ensure cleanup
+                shutdown();
             }
         }
 
@@ -129,16 +141,25 @@ public class Server implements Runnable {
 
         public void shutdown() {
             try {
+                connected = false;
                 if (in != null) in.close();
                 if (out != null) out.close();
                 if (clientSocket != null && !clientSocket.isClosed()) clientSocket.close();
                 synchronized (connections) {
-                    connections.remove(this); // Remove from list
+                    connections.remove(this);
                 }
-                broadcast(nickname + " has left the chat."); // Notify others of disconnection
+                broadcast(username + " has left the chat.");
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public boolean isConnected() {
+            return connected;
         }
     }
 

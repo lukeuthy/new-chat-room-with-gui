@@ -1,6 +1,8 @@
 import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Client implements Runnable {
 
@@ -52,15 +54,23 @@ public class Client implements Runnable {
 
     public void sendMessage(String message) {
         if (out != null) {
-            out.println(message);
+            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
+            String formattedMessage = timestamp + " - Me: " + message;
+            appWindow.appendMessage(formattedMessage); // Show in client GUI
+            out.println(message); // Send actual message to server without "Me"
         }
     }
 
-    public static void main(String[] args) {
-        String username = JOptionPane.showInputDialog("Enter your username:");
-        Client client = new Client(username);
+    public String getUsername() {
+        return username;
+    }
 
-        LoginWindow window = new LoginWindow(client); // Start with the LoginWindow
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public static void main(String[] args) {
+        LoginWindow window = new LoginWindow();
         window.setVisible(true);
     }
 }

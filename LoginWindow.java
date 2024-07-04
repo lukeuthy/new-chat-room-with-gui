@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -12,9 +14,7 @@ public class LoginWindow extends JFrame {
     private JPasswordField passwordText;
     private Client client;
 
-    public LoginWindow(Client client) {
-        this.client = client;
-
+    public LoginWindow() {
         setTitle("Login");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(400, 300);
@@ -71,28 +71,50 @@ public class LoginWindow extends JFrame {
 
         loginButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String username = userText.getText();
-                String password = new String(passwordText.getPassword());
-
-                // Attempt to authenticate
-                if (authenticate(username, password)) {
-                    dispose(); // Close the login window
-                    client.setUsername(username); // Set the username in the client
-                    client.startAppWindow(); // Open the chat client main window
-                    new Thread(client).start(); // Start the client thread
-                } else {
-                    JOptionPane.showMessageDialog(LoginWindow.this, "Invalid username or password.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
+                login();
             }
         });
 
         registerButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new RegisterWindow(); // Open the registration window
+                new RegisterWindow();
+            }
+        });
+
+        // Event listener for Enter key in username and password fields
+        userText.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    login();
+                }
+            }
+        });
+
+        passwordText.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    login();
+                }
             }
         });
 
         setVisible(true);
+    }
+
+    private void login() {
+        String username = userText.getText();
+        String password = new String(passwordText.getPassword());
+
+        if (authenticate(username, password)) {
+            dispose(); // Close the login window
+            client = new Client(username); // Initialize the client with the username
+            client.startAppWindow(); // Open the chat client main window
+            new Thread(client).start(); // Start the client thread
+        } else {
+            JOptionPane.showMessageDialog(LoginWindow.this, "Invalid username or password.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private boolean authenticate(String username, String password) {

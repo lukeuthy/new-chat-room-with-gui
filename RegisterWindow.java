@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.*;
 
 public class RegisterWindow extends JFrame {
@@ -57,27 +59,50 @@ public class RegisterWindow extends JFrame {
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String username = usernameField.getText();
-                String password = new String(passwordField.getPassword());
+                register();
+            }
+        });
 
-                if (username.isEmpty() || password.isEmpty()) {
-                    JOptionPane.showMessageDialog(RegisterWindow.this,
-                            "Please enter both username and password.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
+        // Event listener for Enter key in username and password fields
+        usernameField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    register();
                 }
+            }
+        });
 
-                if (registerUser(username, password)) {
-                    JOptionPane.showMessageDialog(RegisterWindow.this,
-                            "Registration successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                    dispose(); // Close registration window after successful registration
-                } else {
-                    JOptionPane.showMessageDialog(RegisterWindow.this,
-                            "Username already exists. Please choose another username.", "Error", JOptionPane.ERROR_MESSAGE);
+        passwordField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    register();
                 }
             }
         });
 
         setVisible(true);
+    }
+
+    private void register() {
+        String username = usernameField.getText();
+        String password = new String(passwordField.getPassword());
+
+        if (username.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(RegisterWindow.this,
+                    "Please enter both username and password.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (registerUser(username, password)) {
+            JOptionPane.showMessageDialog(RegisterWindow.this,
+                    "Registration successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            dispose(); // Close registration window after successful registration
+        } else {
+            JOptionPane.showMessageDialog(RegisterWindow.this,
+                    "Username already exists. Please choose another username.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private boolean registerUser(String username, String password) {

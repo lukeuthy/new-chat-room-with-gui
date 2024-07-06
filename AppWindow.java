@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.*;
-import java.util.List;
 
 public class AppWindow extends javax.swing.JFrame {
 
@@ -58,6 +57,11 @@ public class AppWindow extends javax.swing.JFrame {
         });
 
         jButton7.setText("Profile");
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
 
         jButton2.setText("Exit");
         jButton2.addActionListener(new ActionListener() {
@@ -67,7 +71,9 @@ public class AppWindow extends javax.swing.JFrame {
             }
         });
 
-        jLabel4.setIcon(new ImageIcon("path/to/logo.png")); // Set your logo here
+        // Load the logo image and set it as an icon
+        ImageIcon logoIcon = new ImageIcon("logo.png");
+        jLabel4.setIcon(logoIcon);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -353,20 +359,12 @@ public class AppWindow extends javax.swing.JFrame {
         return true;
     }
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
-        jTabbedPane1.setSelectedIndex(1); // Switch to Chat Members tab
-    }
-
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {
         jTabbedPane1.setSelectedIndex(0); // Switch to Chats tab
     }
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
-        sendMessage();
-    }
-
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {
-        sendMessage();
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {
+        jTabbedPane1.setSelectedIndex(1); // Switch to Profile tab
     }
 
     public void appendMessage(String message) {
@@ -404,7 +402,7 @@ public class AppWindow extends javax.swing.JFrame {
     }
 
     private String getCredentialsFromDatabase(String username) {
-        try (BufferedReader reader = new BufferedReader(new FileReader("D:\\javaProjects\\javaChatRoom\\src\\database.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("database.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] credentials = line.split(":");

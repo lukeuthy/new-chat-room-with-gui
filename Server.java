@@ -126,7 +126,14 @@ public class Server implements Runnable {
                 broadcast(username + " joined the chat!"); // Notify other clients
                 String message;
                 while ((message = in.readLine()) != null) {
-                    broadcast(username + ": " + message); // Broadcast messages to other clients
+                    if (message.equals("/getActiveUsers")) { // Check for active users command
+                        List<String> activeUsers = getActiveUsers(); // Get active users
+                        for (String user : activeUsers) {
+                            out.println(user); // Send active users to the client
+                        }
+                    } else {
+                        broadcast(username + ": " + message); // Broadcast messages to other clients
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();

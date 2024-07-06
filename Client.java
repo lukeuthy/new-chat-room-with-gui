@@ -3,6 +3,8 @@ import java.io.*;
 import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Client implements Runnable {
 
@@ -67,6 +69,22 @@ public class Client implements Runnable {
 
     public void setUsername(String username) {
         this.username = username; // Set username of client
+    }
+
+    public List<String> getActiveUsers() {
+        List<String> activeUsers = new ArrayList<>();
+        if (out != null) {
+            out.println("/getActiveUsers"); // Send command to get active users
+            try {
+                String user;
+                while (!(user = in.readLine()).equals("")) {
+                    activeUsers.add(user); // Read active users from server
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return activeUsers;
     }
 
     public static void main(String[] args) {

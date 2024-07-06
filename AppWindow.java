@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -79,7 +80,8 @@ public class AppWindow extends javax.swing.JFrame {
             }
         });
 
-        jLabel4.setText("Logo pic here."); // Set text for label 4
+        jLabel4.setText("OneChat"); // Set text for label 4
+        jLabel4.setForeground(Color.WHITE); // Set text color to white for label 4
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1); // Create layout for panel 1
         jPanel1.setLayout(jPanel1Layout);

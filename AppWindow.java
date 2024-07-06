@@ -71,7 +71,6 @@ public class AppWindow extends javax.swing.JFrame {
             }
         });
 
-        // Load the logo image and set it as an icon
         ImageIcon logoIcon = new ImageIcon("logo.png");
         jLabel4.setIcon(logoIcon);
 

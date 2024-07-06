@@ -10,18 +10,18 @@ import java.util.concurrent.Executors;
 
 public class Server implements Runnable {
 
-    private List<ClientConnector> connections = new ArrayList<>(); // List to keep track of active client connections
-    private ServerSocket server; // ServerSocket to accept incoming client connections
-    private boolean done; // Flag to indicate if the server is running
-    private final String LOG_FILE = "chats.txt"; // File to log chat messages
-    private PrintWriter logWriter; // Writer to log messages to file
-    private final ExecutorService pool; // Thread pool to handle client connections
+    private List<ClientConnector> connections = new ArrayList<>();
+    private ServerSocket server;
+    private boolean done;
+    private final String LOG_FILE = "chats.txt";
+    private PrintWriter logWriter;
+    private final ExecutorService pool;
 
     public Server() {
         try {
-            logWriter = new PrintWriter(new FileWriter(LOG_FILE, true)); // Initialize log writer
+            logWriter = new PrintWriter(new FileWriter(LOG_FILE, true));
             done = false;
-            pool = Executors.newFixedThreadPool(10); // Create a thread pool with 10 threads
+            pool = Executors.newFixedThreadPool(10);
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to initialize server", e);
@@ -31,62 +31,62 @@ public class Server implements Runnable {
     @Override
     public void run() {
         try {
-            server = new ServerSocket(10240); // Start server on port 10240
+            server = new ServerSocket(10240);
             System.out.println("Server started on port " + server.getLocalPort());
             while (!done) {
                 try {
-                    Socket clientSocket = server.accept(); // Accept incoming client connections
-                    ClientConnector handler = new ClientConnector(clientSocket); // Create a handler for the client
+                    Socket clientSocket = server.accept();
+                    ClientConnector handler = new ClientConnector(clientSocket);
                     synchronized (connections) {
-                        connections.add(handler); // Add the handler to the list of connections
+                        connections.add(handler);
                     }
-                    pool.execute(handler); // Execute the handler in a separate thread
+                    pool.execute(handler);
                 } catch (IOException e) {
                     e.printStackTrace();
-                    shutdown(); // Shutdown server on error
+                    shutdown();
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
-            shutdown(); // Shutdown server on error
+            shutdown();
         }
     }
 
     public void broadcast(String message) {
-        String timestampedMessage = getTimestamp() + " - " + message; // Add timestamp to message
+        String timestampedMessage = getTimestamp() + " - " + message;
         synchronized (connections) {
             for (ClientConnector ch : connections) {
                 if (ch != null) {
-                    ch.sendMessage(timestampedMessage); // Send message to all connected clients
+                    ch.sendMessage(timestampedMessage);
                 }
             }
         }
-        logMessage(timestampedMessage); // Log message to file
+        logMessage(timestampedMessage);
     }
 
     private synchronized void logMessage(String message) {
-        logWriter.println(message); // Write message to log file
+        logWriter.println(message);
         logWriter.flush();
     }
 
     private String getTimestamp() {
         LocalDateTime timestamp = LocalDateTime.now();
-        return timestamp.format(DateTimeFormatter.ofPattern("HH:mm")); // Format current time as HH:mm
+        return timestamp.format(DateTimeFormatter.ofPattern("HH:mm"));
     }
 
     public void shutdown() {
         try {
             done = true;
             if (server != null && !server.isClosed()) {
-                server.close(); // Close server socket
+                server.close();
             }
             synchronized (connections) {
                 for (ClientConnector ch : connections) {
-                    ch.shutdown(); // Shutdown all client connections
+                    ch.shutdown();
                 }
             }
-            pool.shutdown(); // Shutdown thread pool
-            logWriter.close(); // Close log writer
+            pool.shutdown();
+            logWriter.close();
             System.out.println("Server shutdown completed.");
         } catch (IOException e) {
             e.printStackTrace();
@@ -97,7 +97,7 @@ public class Server implements Runnable {
         List<String> activeUsers = new ArrayList<>();
         synchronized (connections) {
             for (ClientConnector ch : connections) {
-                activeUsers.add(ch.getUsername() + " - " + (ch.isConnected() ? "Online" : "Offline")); // Add username and connection status to list
+                activeUsers.add(ch.getUsername() + " - " + (ch.isConnected() ? "Online" : "Offline"));
             }
         }
         return activeUsers;
@@ -112,31 +112,31 @@ public class Server implements Runnable {
         private boolean connected;
 
         public ClientConnector(Socket clientSocket) {
-            this.clientSocket = clientSocket; // Initialize client socket
+            this.clientSocket = clientSocket;
         }
 
         @Override
         public void run() {
             try {
-                out = new PrintWriter(clientSocket.getOutputStream(), true); // Initialize output stream
-                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())); // Initialize input stream
+                out = new PrintWriter(clientSocket.getOutputStream(), true);
+                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 username = in.readLine(); // Read username from client
                 connected = true;
                 System.out.println(username + " has connected!");
-                broadcast(username + " joined the chat!"); // Notify other clients
+                broadcast(username + " joined the chat!");
                 String message;
                 while ((message = in.readLine()) != null) {
-                    broadcast(username + ": " + message); // Broadcast messages to other clients
+                    broadcast(username + ": " + message);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                shutdown(); // Shutdown client connection on error or disconnection
+                shutdown();
             }
         }
 
         public void sendMessage(String message) {
-            out.println(message); // Send message to client
+            out.println(message);
         }
 
         public void shutdown() {
@@ -146,28 +146,28 @@ public class Server implements Runnable {
                 if (out != null) out.close();
                 if (clientSocket != null && !clientSocket.isClosed()) clientSocket.close();
                 synchronized (connections) {
-                    connections.remove(this); // Remove handler from list of connections
+                    connections.remove(this);
                 }
-                broadcast(username + " has left the chat."); // Notify other clients
+                broadcast(username + " has left the chat.");
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
         public String getUsername() {
-            return username; // Return username of client
+            return username;
         }
 
         public boolean isConnected() {
-            return connected; // Return connection status of client
+            return connected;
         }
     }
 
     public static void main(String[] args) {
         Server server = new Server();
         Thread serverThread = new Thread(server);
-        serverThread.start(); // Start server thread
+        serverThread.start();
 
-        Runtime.getRuntime().addShutdownHook(new Thread(server::shutdown)); // Add shutdown hook to close server properly
+        Runtime.getRuntime().addShutdownHook(new Thread(server::shutdown));
     }
 }

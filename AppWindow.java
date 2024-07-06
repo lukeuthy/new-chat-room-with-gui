@@ -1,77 +1,65 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.List;
 
 public class AppWindow extends javax.swing.JFrame {
 
-    private JTextArea chatArea; // Area to display chat messages
-    private JTextField chatInput; // Field to input chat messages
-    private JButton sendButton; // Button to send messages
-    private JTextArea chatMembersArea; // Area to display chat members
-    private JButton updateCredentialsButton; // Button to update credentials
-    private JButton deleteAccountButton; // Button to delete account
-    private JLabel usernameLabel; // Label for username
-    private JLabel passwordLabel; // Label for password
-    private Client client; // Client instance for sending and receiving messages
+    private JTextArea chatArea;
+    private JTextField chatInput;
+    private JButton sendButton;
+    private JButton updateCredentialsButton;
+    private JButton deleteAccountButton;
+    private JLabel usernameLabel;
+    private JLabel passwordLabel;
+    private Client client;
 
     public AppWindow(Client client) {
-        this.client = client; // Initialize client
-        initComponents(); // Initialize UI components
-        startListeningForMessages(); // Start thread to listen for incoming messages
-        startUpdatingMembersList(); // Start thread to update chat members list
+        this.client = client;
+        initComponents();
+        startListeningForMessages();
+        displayCredentials(); // Display the user's credentials on the profile panel
     }
 
     private void initComponents() {
         jScrollBar1 = new javax.swing.JScrollBar();
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
-        jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         jButton7 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel2 = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
 
-        chatArea = new JTextArea(); // Create chat area
-        chatInput = new JTextField(); // Create chat input field
-        sendButton = new JButton("Send"); // Create send button
-        chatMembersArea = new JTextArea(); // Create chat members area
-        updateCredentialsButton = new JButton("Update Credentials"); // Create update credentials button
-        deleteAccountButton = new JButton("Delete Account"); // Create delete account button
-        usernameLabel = new JLabel("Username:"); // Create username label
-        passwordLabel = new JLabel("Password:"); // Create password label
-        jLabel1 = new JLabel("Chat Members"); // Create chat members label
+        chatArea = new JTextArea();
+        chatInput = new JTextField();
+        sendButton = new JButton("Send");
+        updateCredentialsButton = new JButton("Update Credentials");
+        deleteAccountButton = new JButton("Delete Account");
+        usernameLabel = new JLabel("Username:");
+        passwordLabel = new JLabel("Password:");
+        jLabel1 = new JLabel("Chat Members");
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE); // Set default close operation
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jPanel1.setBackground(new java.awt.Color(64, 64, 64)); // Set background color
+        jPanel1.setBackground(new java.awt.Color(64, 64, 64));
 
-        jButton3.setText("Chat Members"); // Set text for button 3
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt); // Action for button 3
-            }
-        });
-
-        jButton4.setText("Chats"); // Set text for button 4
+        jButton4.setText("Chats");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt); // Action for button 4
+                jButton4ActionPerformed(evt);
             }
         });
 
-        jButton7.setText("Profile"); // Set text for button 7
+        jButton7.setText("Profile");
 
-        jButton2.setText("Exit"); // Set text for exit button
+        jButton2.setText("Exit");
         jButton2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -79,15 +67,14 @@ public class AppWindow extends javax.swing.JFrame {
             }
         });
 
-        jLabel4.setText("Logo pic here."); // Set text for label 4
+        jLabel4.setIcon(new ImageIcon("path/to/logo.png")); // Set your logo here
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1); // Create layout for panel 1
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
                 jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
                         .addComponent(jButton7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addContainerGap()
@@ -102,23 +89,21 @@ public class AppWindow extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap())
         );
 
-        chatArea.setEditable(false); // Make chat area non-editable
-        chatArea.setLineWrap(true); // Enable line wrap
-        chatArea.setWrapStyleWord(true); // Wrap by word
-        JScrollPane chatScrollPane = new JScrollPane(chatArea); // Add chat area to scroll pane
+        chatArea.setEditable(false);
+        chatArea.setLineWrap(true);
+        chatArea.setWrapStyleWord(true);
+        JScrollPane chatScrollPane = new JScrollPane(chatArea);
 
         sendButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                sendMessage(); // Send message when button is clicked
+                sendMessage();
             }
         });
 
@@ -127,12 +112,12 @@ public class AppWindow extends javax.swing.JFrame {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    sendMessage(); // Send message when Enter key is pressed
+                    sendMessage();
                 }
             }
         });
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2); // Create layout for panel 2
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
                 jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -155,55 +140,27 @@ public class AppWindow extends javax.swing.JFrame {
                                 .addGap(6, 6, 6))
         );
 
-        jTabbedPane1.addTab("Chats", jPanel2); // Add panel 2 to tabbed pane
+        jTabbedPane1.addTab("Chats", jPanel2);
 
-        chatMembersArea.setEditable(false); // Make chat members area non-editable
-        chatMembersArea.setLineWrap(true); // Enable line wrap
-        chatMembersArea.setWrapStyleWord(true); // Wrap by word
-        JScrollPane chatMembersScrollPane = new JScrollPane(chatMembersArea); // Add chat members area to scroll pane
+        usernameLabel.setText("Username: " + client.getUsername());
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3); // Create layout for panel 3
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(chatMembersScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel1))
-                                .addContainerGap(368, Short.MAX_VALUE))
-        );
-        jPanel3Layout.setVerticalGroup(
-                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addGap(18, 18, 18)
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(chatMembersScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
-                                .addContainerGap())
-        );
-
-        jTabbedPane1.addTab("Chat Members", jPanel3); // Add panel 3 to tabbed pane
-
-        usernameLabel.setText("Username:"); // Set text for username label
-
-        passwordLabel.setText("Password:"); // Set text for password label
+        passwordLabel.setText("Password: *****");
 
         updateCredentialsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                updateCredentials(); // Action for update credentials button
+                updateCredentials();
             }
         });
 
         deleteAccountButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                deleteAccount(); // Action for delete account button
+                deleteAccount();
             }
         });
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4); // Create layout for panel 4
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
                 jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -230,9 +187,9 @@ public class AppWindow extends javax.swing.JFrame {
                                 .addContainerGap(227, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Profile", jPanel4); // Add panel 4 to tabbed pane
+        jTabbedPane1.addTab("Profile", jPanel4);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane()); // Create layout for content pane
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -252,21 +209,148 @@ public class AppWindow extends javax.swing.JFrame {
                                 .addContainerGap())
         );
 
-        pack(); // Pack the components
+        pack();
     }
 
     private void sendMessage() {
-        String message = chatInput.getText(); // Get the message from chat input
-        chatInput.setText(""); // Clear the chat input
-        client.sendMessage(message); // Send the message using client
+        String message = chatInput.getText();
+        chatInput.setText("");
+        client.sendMessage(message);
     }
 
     private void updateCredentials() {
-        JOptionPane.showMessageDialog(this, "Update Credentials functionality to be implemented."); // Placeholder for update credentials functionality
+        JDialog updateDialog = new JDialog(this, "Update Credentials", true);
+        updateDialog.setLayout(new GridLayout(3, 2));
+
+        JLabel usernameLabel = new JLabel("New Username:");
+        JTextField usernameField = new JTextField(client.getUsername());
+        JLabel passwordLabel = new JLabel("New Password:");
+        JPasswordField passwordField = new JPasswordField();
+
+        JButton updateButton = new JButton("Update");
+        updateButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String newUsername = usernameField.getText();
+                String newPassword = new String(passwordField.getPassword());
+
+                if (updateUserInDatabase(client.getUsername(), newUsername, newPassword)) {
+                    client.setUsername(newUsername);
+                    AppWindow.this.usernameLabel.setText("Username: " + newUsername);
+                    updateDialog.dispose();
+                    JOptionPane.showMessageDialog(AppWindow.this, "Credentials updated successfully.");
+                } else {
+                    JOptionPane.showMessageDialog(AppWindow.this, "Failed to update credentials.");
+                }
+            }
+        });
+
+        updateDialog.add(usernameLabel);
+        updateDialog.add(usernameField);
+        updateDialog.add(passwordLabel);
+        updateDialog.add(passwordField);
+        updateDialog.add(new JLabel()); // Empty cell
+        updateDialog.add(updateButton);
+
+        updateDialog.pack();
+        updateDialog.setLocationRelativeTo(this);
+        updateDialog.setVisible(true);
+    }
+
+    private boolean updateUserInDatabase(String oldUsername, String newUsername, String newPassword) {
+        File inputFile = new File("D:\\javaProjects\\javaChatRoom\\src\\database.txt");
+        File tempFile = new File("D:\\javaProjects\\javaChatRoom\\src\\database_temp.txt");
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] credentials = line.split(":");
+                if (credentials.length == 2) {
+                    String fileUsername = credentials[0];
+                    if (fileUsername.equals(oldUsername)) {
+                        writer.write(newUsername + ":" + newPassword);
+                    } else {
+                        writer.write(line);
+                    }
+                    writer.newLine();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        if (!inputFile.delete() || !tempFile.renameTo(inputFile)) {
+            return false;
+        }
+
+        return true;
     }
 
     private void deleteAccount() {
-        JOptionPane.showMessageDialog(this, "Delete Account functionality to be implemented."); // Placeholder for delete account functionality
+        String password = JOptionPane.showInputDialog(this, "Enter password to confirm:", "Delete Account", JOptionPane.WARNING_MESSAGE);
+        if (password != null && authenticate(client.getUsername(), password)) {
+            int confirmation = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete your account?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
+            if (confirmation == JOptionPane.YES_OPTION) {
+                if (deleteUserFromDatabase(client.getUsername())) {
+                    JOptionPane.showMessageDialog(this, "Account deleted successfully.");
+                    System.exit(0); // Exit the application
+                } else {
+                    JOptionPane.showMessageDialog(this, "Failed to delete account.");
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Authentication failed.");
+        }
+    }
+
+    private boolean authenticate(String username, String password) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("D:\\javaProjects\\javaChatRoom\\src\\database.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] credentials = line.split(":");
+                if (credentials.length == 2) {
+                    String fileUsername = credentials[0];
+                    String filePassword = credentials[1];
+                    if (fileUsername.equals(username) && filePassword.equals(password)) {
+                        return true;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private boolean deleteUserFromDatabase(String username) {
+        File inputFile = new File("D:\\javaProjects\\javaChatRoom\\src\\database.txt");
+        File tempFile = new File("D:\\javaProjects\\javaChatRoom\\src\\database_temp.txt");
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] credentials = line.split(":");
+                if (credentials.length == 2) {
+                    String fileUsername = credentials[0];
+                    if (!fileUsername.equals(username)) {
+                        writer.write(line);
+                        writer.newLine();
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        if (!inputFile.delete() || !tempFile.renameTo(inputFile)) {
+            return false;
+        }
+
+        return true;
     }
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
@@ -278,21 +362,21 @@ public class AppWindow extends javax.swing.JFrame {
     }
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
-        sendMessage(); // Send message on button 1 action
+        sendMessage();
     }
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {
-        sendMessage(); // Send message on text field action
+        sendMessage();
     }
 
     public void appendMessage(String message) {
-        chatArea.append(message + "\n"); // Append message to chat area
+        chatArea.append(message + "\n");
     }
 
     private void startListeningForMessages() {
         Thread listenerThread = new Thread(() -> {
             try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(client.clientSocket.getInputStream())); // Create input stream reader
+                BufferedReader in = new BufferedReader(new InputStreamReader(client.clientSocket.getInputStream()));
                 String message;
                 while ((message = in.readLine()) != null) {
                     if (message.contains(client.getUsername())) {
@@ -301,37 +385,43 @@ public class AppWindow extends javax.swing.JFrame {
                             message = message.replace(client.getUsername() + ": ", "Me: ");
                         }
                     }
-                    appendMessage(message); // Append message to chat area
+                    appendMessage(message);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
-        listenerThread.start(); // Start the listener thread
+        listenerThread.start();
     }
 
-    private void startUpdatingMembersList() {
-        Thread membersUpdateThread = new Thread(() -> {
-            while (true) {
-                try {
-                    List<String> activeUsers = client.getActiveUsers(); // Get active users from client
-                    chatMembersArea.setText(""); // Clear chat members area
-                    for (String user : activeUsers) {
-                        chatMembersArea.append(user + "\n"); // Append active users to chat members area
-                    }
-                    Thread.sleep(5000); // Update every 5 seconds
-                } catch (Exception e) {
-                    e.printStackTrace();
+    private void displayCredentials() {
+        String credentials = getCredentialsFromDatabase(client.getUsername());
+        if (credentials != null) {
+            String[] parts = credentials.split(":");
+            usernameLabel.setText("Username: " + parts[0]);
+            passwordLabel.setText("Password: *****"); // Masked for security
+        }
+    }
+
+    private String getCredentialsFromDatabase(String username) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("D:\\javaProjects\\javaChatRoom\\src\\database.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] credentials = line.split(":");
+                if (credentials.length == 2 && credentials[0].equals(username)) {
+                    return line;
                 }
             }
-        });
-        membersUpdateThread.start(); // Start the members update thread
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new AppWindow(new Client("DefaultUser")).setVisible(true); // Create and display the app window
+                new AppWindow(new Client("DefaultUser")).setVisible(true);
             }
         });
     }

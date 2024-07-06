@@ -13,22 +13,22 @@ public class Client implements Runnable {
     private String username;
 
     public Client(String username) {
-        this.username = username; // Set the username
+        this.username = username;
     }
 
     @Override
     public void run() {
         try {
-            clientSocket = new Socket("10.15.9.95", 10240); // Connect to server
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())); // Initialize input stream
-            out = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream()), true); // Initialize output stream
+            clientSocket = new Socket("127.0.0.1", 10240); // Match the server port
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            out = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream()), true);
 
             out.println(username); // Send username to server
 
             String inMessage;
             while ((inMessage = in.readLine()) != null) {
                 if (appWindow != null) {
-                    appWindow.appendMessage(inMessage); // Append incoming messages to app window
+                    appWindow.appendMessage(inMessage);
                 }
             }
 
@@ -38,7 +38,7 @@ public class Client implements Runnable {
             try {
                 if (in != null) in.close();
                 if (out != null) out.close();
-                if (clientSocket != null && !clientSocket.isClosed()) clientSocket.close(); // Close resources on disconnection
+                if (clientSocket != null && !clientSocket.isClosed()) clientSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -47,7 +47,7 @@ public class Client implements Runnable {
 
     public void startAppWindow() {
         SwingUtilities.invokeLater(() -> {
-            appWindow = new AppWindow(this); // Create and show app window on event dispatch thread
+            appWindow = new AppWindow(this);
             appWindow.setVisible(true);
         });
     }
@@ -56,21 +56,21 @@ public class Client implements Runnable {
         if (out != null) {
             String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
             String formattedMessage = timestamp + " - Me: " + message;
-            appWindow.appendMessage(formattedMessage); // Show message in client GUI
+            appWindow.appendMessage(formattedMessage); // Show in client GUI
             out.println(message); // Send actual message to server without "Me"
         }
     }
 
     public String getUsername() {
-        return username; // Return username of client
+        return username;
     }
 
     public void setUsername(String username) {
-        this.username = username; // Set username of client
+        this.username = username;
     }
 
     public static void main(String[] args) {
         LoginWindow window = new LoginWindow();
-        window.setVisible(true); // Show login window
+        window.setVisible(true);
     }
 }

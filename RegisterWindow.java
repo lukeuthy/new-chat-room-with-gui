@@ -106,7 +106,10 @@ public class RegisterWindow extends JFrame {
     }
 
     private boolean registerUser(String username, String password) {
-        try (BufferedReader reader = new BufferedReader(new FileReader("database.txt"))) {
+        File databaseFile = new File("D:\\javaProjects\\javaChatRoom\\src\\database.txt");
+
+        // Check if username already exists
+        try (BufferedReader reader = new BufferedReader(new FileReader(databaseFile))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(":");
@@ -119,7 +122,8 @@ public class RegisterWindow extends JFrame {
             return false;
         }
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("database.txt", true))) {
+        // Register new user
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(databaseFile, true))) {
             writer.write(username + ":" + password);
             writer.newLine();
         } catch (IOException ex) {
@@ -128,5 +132,9 @@ public class RegisterWindow extends JFrame {
         }
 
         return true; // Registration successful
+    }
+
+    public static void main(String[] args) {
+        new RegisterWindow();
     }
 }

@@ -19,7 +19,7 @@ public class Client implements Runnable {
     @Override
     public void run() {
         try {
-            clientSocket = new Socket("127.0.0.1", 10240); // Match the server port
+            clientSocket = new Socket("10.15.9.95", 10240); // Match the server port
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             out = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream()), true);
 

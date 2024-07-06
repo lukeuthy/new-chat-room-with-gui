@@ -34,3 +34,12 @@
 14:50 - GET_CREDENTIALS joined the chat!
 14:50 - GET_CREDENTIALS has left the chat.
 14:50 - GET_CREDENTIALS has left the chat.
+16:04 - admin joined the chat!
+16:04 - Nikko joined the chat!
+16:04 - Nikko: hello
+16:06 - admin has left the chat.
+16:06 - Nikko has left the chat.
+16:06 - admin joined the chat!
+16:11 - admin joined the chat!
+16:12 - admin has left the chat.
+16:15 - admin has left the chat.

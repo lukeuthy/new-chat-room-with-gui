@@ -106,7 +106,7 @@ public class RegisterWindow extends JFrame {
     }
 
     private boolean registerUser(String username, String password) {
-        File databaseFile = new File("D:\\javaProjects\\javaChatRoom\\src\\database.txt");
+        File databaseFile = new File("database.txt");
 
         // Check if username already exists
         try (BufferedReader reader = new BufferedReader(new FileReader(databaseFile))) {
@@ -123,7 +123,7 @@ public class RegisterWindow extends JFrame {
         }
 
         // Register new user
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(databaseFile, true))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("database.txt", true))) {
             writer.write(username + ":" + password);
             writer.newLine();
         } catch (IOException ex) {

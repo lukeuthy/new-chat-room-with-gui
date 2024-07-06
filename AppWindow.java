@@ -10,21 +10,21 @@ import java.util.List;
 
 public class AppWindow extends javax.swing.JFrame {
 
-    private JTextArea chatArea;
-    private JTextField chatInput;
-    private JButton sendButton;
-    private JTextArea chatMembersArea;
-    private JButton updateCredentialsButton;
-    private JButton deleteAccountButton;
-    private JLabel usernameLabel;
-    private JLabel passwordLabel;
-    private Client client;
+    private JTextArea chatArea; // Area to display chat messages
+    private JTextField chatInput; // Field to input chat messages
+    private JButton sendButton; // Button to send messages
+    private JTextArea chatMembersArea; // Area to display chat members
+    private JButton updateCredentialsButton; // Button to update credentials
+    private JButton deleteAccountButton; // Button to delete account
+    private JLabel usernameLabel; // Label for username
+    private JLabel passwordLabel; // Label for password
+    private Client client; // Client instance for sending and receiving messages
 
     public AppWindow(Client client) {
-        this.client = client;
-        initComponents();
-        startListeningForMessages();
-        startUpdatingMembersList();
+        this.client = client; // Initialize client
+        initComponents(); // Initialize UI components
+        startListeningForMessages(); // Start thread to listen for incoming messages
+        startUpdatingMembersList(); // Start thread to update chat members list
     }
 
     private void initComponents() {
@@ -41,37 +41,37 @@ public class AppWindow extends javax.swing.JFrame {
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
 
-        chatArea = new JTextArea();
-        chatInput = new JTextField();
-        sendButton = new JButton("Send");
-        chatMembersArea = new JTextArea();
-        updateCredentialsButton = new JButton("Update Credentials");
-        deleteAccountButton = new JButton("Delete Account");
-        usernameLabel = new JLabel("Username:");
-        passwordLabel = new JLabel("Password:");
-        jLabel1 = new JLabel("Chat Members");
+        chatArea = new JTextArea(); // Create chat area
+        chatInput = new JTextField(); // Create chat input field
+        sendButton = new JButton("Send"); // Create send button
+        chatMembersArea = new JTextArea(); // Create chat members area
+        updateCredentialsButton = new JButton("Update Credentials"); // Create update credentials button
+        deleteAccountButton = new JButton("Delete Account"); // Create delete account button
+        usernameLabel = new JLabel("Username:"); // Create username label
+        passwordLabel = new JLabel("Password:"); // Create password label
+        jLabel1 = new JLabel("Chat Members"); // Create chat members label
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE); // Set default close operation
 
-        jPanel1.setBackground(new java.awt.Color(64, 64, 64));
+        jPanel1.setBackground(new java.awt.Color(64, 64, 64)); // Set background color
 
-        jButton3.setText("Chat Members");
+        jButton3.setText("Chat Members"); // Set text for button 3
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                jButton3ActionPerformed(evt); // Action for button 3
             }
         });
 
-        jButton4.setText("Chats");
+        jButton4.setText("Chats"); // Set text for button 4
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                jButton4ActionPerformed(evt); // Action for button 4
             }
         });
 
-        jButton7.setText("Profile");
+        jButton7.setText("Profile"); // Set text for button 7
 
-        jButton2.setText("Exit");
+        jButton2.setText("Exit"); // Set text for exit button
         jButton2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -79,9 +79,9 @@ public class AppWindow extends javax.swing.JFrame {
             }
         });
 
-        jLabel4.setText("Logo pic here.");
+        jLabel4.setText("Logo pic here."); // Set text for label 4
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1); // Create layout for panel 1
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
                 jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -102,22 +102,23 @@ public class AppWindow extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERREDMETHOD
-                                        .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addContainerGap())
-                        );
+                                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap())
+        );
 
-        chatArea.setEditable(false);
-        chatArea.setLineWrap(true);
-        chatArea.setWrapStyleWord(true);
-        JScrollPane chatScrollPane = new JScrollPane(chatArea);
+        chatArea.setEditable(false); // Make chat area non-editable
+        chatArea.setLineWrap(true); // Enable line wrap
+        chatArea.setWrapStyleWord(true); // Wrap by word
+        JScrollPane chatScrollPane = new JScrollPane(chatArea); // Add chat area to scroll pane
 
         sendButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                sendMessage();
+                sendMessage(); // Send message when button is clicked
             }
         });
 
@@ -126,12 +127,12 @@ public class AppWindow extends javax.swing.JFrame {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    sendMessage();
+                    sendMessage(); // Send message when Enter key is pressed
                 }
             }
         });
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2); // Create layout for panel 2
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
                 jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -154,14 +155,14 @@ public class AppWindow extends javax.swing.JFrame {
                                 .addGap(6, 6, 6))
         );
 
-        jTabbedPane1.addTab("Chats", jPanel2);
+        jTabbedPane1.addTab("Chats", jPanel2); // Add panel 2 to tabbed pane
 
-        chatMembersArea.setEditable(false);
-        chatMembersArea.setLineWrap(true);
-        chatMembersArea.setWrapStyleWord(true);
-        JScrollPane chatMembersScrollPane = new JScrollPane(chatMembersArea);
+        chatMembersArea.setEditable(false); // Make chat members area non-editable
+        chatMembersArea.setLineWrap(true); // Enable line wrap
+        chatMembersArea.setWrapStyleWord(true); // Wrap by word
+        JScrollPane chatMembersScrollPane = new JScrollPane(chatMembersArea); // Add chat members area to scroll pane
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3); // Create layout for panel 3
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
                 jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -182,27 +183,27 @@ public class AppWindow extends javax.swing.JFrame {
                                 .addContainerGap())
         );
 
-        jTabbedPane1.addTab("Chat Members", jPanel3);
+        jTabbedPane1.addTab("Chat Members", jPanel3); // Add panel 3 to tabbed pane
 
-        usernameLabel.setText("Username:");
+        usernameLabel.setText("Username:"); // Set text for username label
 
-        passwordLabel.setText("Password:");
+        passwordLabel.setText("Password:"); // Set text for password label
 
         updateCredentialsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                updateCredentials();
+                updateCredentials(); // Action for update credentials button
             }
         });
 
         deleteAccountButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                deleteAccount();
+                deleteAccount(); // Action for delete account button
             }
         });
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4); // Create layout for panel 4
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
                 jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -229,9 +230,9 @@ public class AppWindow extends javax.swing.JFrame {
                                 .addContainerGap(227, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Profile", jPanel4);
+        jTabbedPane1.addTab("Profile", jPanel4); // Add panel 4 to tabbed pane
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane()); // Create layout for content pane
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -251,21 +252,21 @@ public class AppWindow extends javax.swing.JFrame {
                                 .addContainerGap())
         );
 
-        pack();
+        pack(); // Pack the components
     }
 
     private void sendMessage() {
-        String message = chatInput.getText();
-        chatInput.setText("");
-        client.sendMessage(message);
+        String message = chatInput.getText(); // Get the message from chat input
+        chatInput.setText(""); // Clear the chat input
+        client.sendMessage(message); // Send the message using client
     }
 
     private void updateCredentials() {
-        JOptionPane.showMessageDialog(this, "Update Credentials functionality to be implemented.");
+        JOptionPane.showMessageDialog(this, "Update Credentials functionality to be implemented."); // Placeholder for update credentials functionality
     }
 
     private void deleteAccount() {
-        JOptionPane.showMessageDialog(this, "Delete Account functionality to be implemented.");
+        JOptionPane.showMessageDialog(this, "Delete Account functionality to be implemented."); // Placeholder for delete account functionality
     }
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
@@ -277,21 +278,21 @@ public class AppWindow extends javax.swing.JFrame {
     }
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
-        sendMessage();
+        sendMessage(); // Send message on button 1 action
     }
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {
-        sendMessage();
+        sendMessage(); // Send message on text field action
     }
 
     public void appendMessage(String message) {
-        chatArea.append(message + "\n");
+        chatArea.append(message + "\n"); // Append message to chat area
     }
 
     private void startListeningForMessages() {
         Thread listenerThread = new Thread(() -> {
             try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(client.clientSocket.getInputStream()));
+                BufferedReader in = new BufferedReader(new InputStreamReader(client.clientSocket.getInputStream())); // Create input stream reader
                 String message;
                 while ((message = in.readLine()) != null) {
                     if (message.contains(client.getUsername())) {
@@ -300,23 +301,23 @@ public class AppWindow extends javax.swing.JFrame {
                             message = message.replace(client.getUsername() + ": ", "Me: ");
                         }
                     }
-                    appendMessage(message);
+                    appendMessage(message); // Append message to chat area
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
-        listenerThread.start();
+        listenerThread.start(); // Start the listener thread
     }
 
     private void startUpdatingMembersList() {
         Thread membersUpdateThread = new Thread(() -> {
             while (true) {
                 try {
-                    List<String> activeUsers = client.getActiveUsers();
-                    chatMembersArea.setText("");
+                    List<String> activeUsers = client.getActiveUsers(); // Get active users from client
+                    chatMembersArea.setText(""); // Clear chat members area
                     for (String user : activeUsers) {
-                        chatMembersArea.append(user + "\n");
+                        chatMembersArea.append(user + "\n"); // Append active users to chat members area
                     }
                     Thread.sleep(5000); // Update every 5 seconds
                 } catch (Exception e) {
@@ -324,13 +325,13 @@ public class AppWindow extends javax.swing.JFrame {
                 }
             }
         });
-        membersUpdateThread.start();
+        membersUpdateThread.start(); // Start the members update thread
     }
 
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new AppWindow(new Client("DefaultUser")).setVisible(true);
+                new AppWindow(new Client("DefaultUser")).setVisible(true); // Create and display the app window
             }
         });
     }

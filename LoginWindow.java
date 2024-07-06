@@ -104,8 +104,8 @@ public class LoginWindow extends JFrame {
     }
 
     private void login() {
-        String username = userText.getText();
-        String password = new String(passwordText.getPassword());
+        String username = userText.getText().trim();
+        String password = new String(passwordText.getPassword()).trim();
 
         if (authenticate(username, password)) {
             dispose(); // Close the login window
@@ -118,13 +118,13 @@ public class LoginWindow extends JFrame {
     }
 
     private boolean authenticate(String username, String password) {
-        try (BufferedReader reader = new BufferedReader(new FileReader("D:\\javaProjects\\javaChatRoom\\src\\database.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("database.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] credentials = line.split(":");
                 if (credentials.length == 2) {
-                    String fileUsername = credentials[0];
-                    String filePassword = credentials[1];
+                    String fileUsername = credentials[0].trim();
+                    String filePassword = credentials[1].trim();
                     if (fileUsername.equals(username) && filePassword.equals(password)) {
                         return true;
                     }
@@ -135,9 +135,5 @@ public class LoginWindow extends JFrame {
             e.printStackTrace();
         }
         return false;
-    }
-
-    public static void main(String[] args) {
-        new LoginWindow();
     }
 }

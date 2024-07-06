@@ -258,8 +258,8 @@ public class AppWindow extends javax.swing.JFrame {
     }
 
     private boolean updateUserInDatabase(String oldUsername, String newUsername, String newPassword) {
-        File inputFile = new File("D:\\javaProjects\\javaChatRoom\\src\\database.txt");
-        File tempFile = new File("D:\\javaProjects\\javaChatRoom\\src\\database_temp.txt");
+        File inputFile = new File("database.txt");
+        File tempFile = new File("database_temp.txt");
 
         try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
              BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
@@ -306,7 +306,7 @@ public class AppWindow extends javax.swing.JFrame {
     }
 
     private boolean authenticate(String username, String password) {
-        try (BufferedReader reader = new BufferedReader(new FileReader("D:\\javaProjects\\javaChatRoom\\src\\database.txt"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("database.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] credentials = line.split(":");
@@ -325,8 +325,8 @@ public class AppWindow extends javax.swing.JFrame {
     }
 
     private boolean deleteUserFromDatabase(String username) {
-        File inputFile = new File("D:\\javaProjects\\javaChatRoom\\src\\database.txt");
-        File tempFile = new File("D:\\javaProjects\\javaChatRoom\\src\\database_temp.txt");
+        File inputFile = new File("database.txt");
+        File tempFile = new File("database_temp.txt");
 
         try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
              BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {

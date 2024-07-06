@@ -52,11 +52,11 @@ public class Server implements Runnable {
         }
     }
 
-    public void broadcast(String message) {
+    public void broadcast(String message, ClientConnector sender) {
         String timestampedMessage = getTimestamp() + " - " + message;
         synchronized (connections) {
             for (ClientConnector ch : connections) {
-                if (ch != null) {
+                if (ch != null && ch != sender) { // Avoid sending message back to the sender
                     ch.sendMessage(timestampedMessage);
                 }
             }
@@ -123,10 +123,10 @@ public class Server implements Runnable {
                 username = in.readLine(); // Read username from client
                 connected = true;
                 System.out.println(username + " has connected!");
-                broadcast(username + " joined the chat!");
+                broadcast(username + " joined the chat!", this);
                 String message;
                 while ((message = in.readLine()) != null) {
-                    broadcast(username + ": " + message);
+                    broadcast(username + ": " + message, this);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -148,7 +148,7 @@ public class Server implements Runnable {
                 synchronized (connections) {
                     connections.remove(this);
                 }
-                broadcast(username + " has left the chat.");
+                broadcast(username + " has left the chat.", this);
             } catch (IOException e) {
                 e.printStackTrace();
             }
